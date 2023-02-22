@@ -16,7 +16,32 @@ describe("Login", () => {
     cy.get(".anav-top").eq(0).find("li").should("have.length", 8);
   });
 
-  it.only("order broccoli", () => {
+  it("verify if order more or less than min amount", () => {
+    cy.contains("Veggies & Fruits").click();
+    cy.get("article").eq(1).contains("Add to cart").click();
+    cy.contains("Shopping Cart").click();
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.url().should("contain", "/cart?action=show");
+
+    const price = cy
+      .get("#card-subtotal-products .value")
+      .invoke("text")
+      .then((text) => {
+        const priceString = text.replace(/[^\d.-]/g, "");
+        const price = parseFloat(priceString);
+        cy.wrap(price).as("total-price");
+      });
+
+    if (cy.get("@total-price") < 50000) {
+      cy.get('[class="alert alert-warning"]').should("be.visible");
+      cy.contains("Checkout").should("be.disabled");
+    }
+    if (cy.get("@total-price") > 50000) {
+      cy.contains("Checkout").click();
+    }
+  });
+
+  it("order broccoli", () => {
     cy.contains("Veggies & Fruits").click();
     cy.contains("Add to cart").eq(0).click();
     cy.contains("Shopping Cart").click();
@@ -65,5 +90,16 @@ describe("Login", () => {
     cy.get("#conditions_to_approve").click();
     // cy.get('.ps-shown-by-js > .btn').click().should(); // place order
     //cy.url().should('include', '/order-confirmation');
+  });
+
+  it.only("verify search results", () => {
+    cy.get(".search-open-btn").click();
+    cy.get("form[class='search-form open']").should("be.visible");
+    cy.get('[placeholder="Search"]').type("cheese");
+    cy.get(".center_wrapper > button.hidden-sm-down").click();
+
+    cy.get('[class="h3 product-title"]').each((item) => {
+      cy.wrap(item).should("contain", "Cheese");
+    });
   });
 });
