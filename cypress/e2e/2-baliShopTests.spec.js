@@ -4,6 +4,7 @@ describe("Login", () => {
     cy.get('[placeholder="Email"]').type("luzefegy@finews.biz");
     cy.get('[placeholder="Password"]').type("itsmeHello1!");
     cy.get("#submit-login").click();
+    cy.get(".notification_cookie-accept").click();
 
     cy.url().should("contain", "/my-account");
   });
@@ -118,9 +119,51 @@ describe("Login", () => {
       .and("contain", "Basil Italian (100gr)");
   });
 
-  it.only("check if cart is empty when click on x(delete)", () => {});
+  it("check if cart is empty when click on x(delete)", () => {
+    cy.contains("Veggies & Fruits").click();
+    cy.get("[data-id-product='9']").find(".an_productattributes-add").click();
+    cy.get(".sb-close-btn").click();
+    cy.get('[data-id-product="289"]').find(".an_productattributes-add").click();
+    cy.get(".sb-close-btn").click();
+    cy.get('[data-id-product="11"]').find(".an_productattributes-add").click();
+    cy.get(
+      "#js-cart-sidebar > .cart-dropdown-wrapper > .cart-items > .cart-product-line > .product-remove > .remove-from-cart"
+    )
+      .eq(1)
+      .click({ force: true }); // remove 1 item from the preview cart
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.get(".cart-item").find(".remove-from-cart").eq(0).click(); // delete 2nd item from the card
+    cy.get(".cart-item").find(".remove-from-cart").eq(1).click(); // delete last item from the card
+    cy.get(".no-items").should("be.visible"); // check if cart is empty
+  });
 
-  // add, update address
-  //create new address
-  //more tests with calculations and ===
+  it(" verify add new address", () => {
+    cy.contains("Addresses").click();
+    cy.get('[data-link-action="add-address"]').click();
+    cy.get('[name="alias"]').type("work");
+    cy.get('[name="address1"]').type("Jl. Canggu Padang Linjong No.12a");
+    cy.get('[name="postcode"]').type("80351");
+    cy.get('[name="city"]').type("Kuta Utara");
+    cy.get("select")
+      .eq(0)
+      .select("385")
+      .should("contain", "Canggu to Pererenan");
+    cy.get('[name="phone_mobile"]').type("+6282147372752");
+    cy.contains("Save").click();
+    cy.get("#address-438").should("contain", "work");
+  });
+
+  it(" verify update address", () => {
+    cy.contains("Addresses").click();
+    cy.get("[data-link-action='edit-address']").eq(0).click();
+    cy.get('[name="alias"]').clear().type("home");
+    cy.contains("Save").click();
+    cy.get("#address-436").should("contain", "home");
+  });
+
+  it(" verify update address", () => {
+    cy.contains("Addresses").click();
+    cy.get("[data-link-action='delete-address']").eq(1).click();
+    cy.get("#content").should("have.length", "1");
+  });
 });
