@@ -103,7 +103,7 @@ describe("Login", () => {
     });
   });
 
-  it.only("verify add to favourites", () => {
+  it("verify add to favourites", () => {
     cy.contains("Veggies & Fruits").click();
 
     cy.get("[data-id-product='1']").find(".product-title").click();
@@ -117,7 +117,9 @@ describe("Login", () => {
       .and("contain", "Broccoli")
       .and("contain", "Basil Italian (100gr)");
   });
-  //check if cart is empty when click on x
+
+  it.only("check if cart is empty when click on x(delete)", () => {});
+
   // add, update address
   //create new address
   //more tests with calculations and ===
