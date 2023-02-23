@@ -92,7 +92,7 @@ describe("Login", () => {
     //cy.url().should('include', '/order-confirmation');
   });
 
-  it.only("verify search results", () => {
+  it("verify search results", () => {
     cy.get(".search-open-btn").click();
     cy.get("form[class='search-form open']").should("be.visible");
     cy.get('[placeholder="Search"]').type("cheese");
@@ -102,4 +102,23 @@ describe("Login", () => {
       cy.wrap(item).should("contain", "Cheese");
     });
   });
+
+  it.only("verify add to favourites", () => {
+    cy.contains("Veggies & Fruits").click();
+
+    cy.get("[data-id-product='1']").find(".product-title").click();
+    cy.get('[class="an_wishlist-mini js-an_wishlist-container"]').eq(0).click();
+    cy.get(".breadcrumb li").eq(2).click();
+    cy.get("[data-id-product='289']").find(".product-title").click();
+    cy.get('[class="an_wishlist-mini js-an_wishlist-container"]').eq(0).click();
+    cy.get(".js-an_wishlist-nav-count").should("contain", "2");
+    cy.get("#_desktop_an_wishlist-nav").click();
+    cy.get("[class='products row']")
+      .and("contain", "Broccoli")
+      .and("contain", "Basil Italian (100gr)");
+  });
+  //check if cart is empty when click on x
+  // add, update address
+  //create new address
+  //more tests with calculations and ===
 });
