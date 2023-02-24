@@ -9,11 +9,11 @@ describe("Login", () => {
     cy.url().should("contain", "/my-account");
   });
 
-  it("home page", () => {
+  it("verify home page", () => {
     cy.get("h1").should("contain", "Your account");
   });
 
-  it("verify nav", () => {
+  it("verify nav bar", () => {
     cy.get(".anav-top").eq(0).find("li").should("have.length", 8);
   });
 
@@ -42,7 +42,7 @@ describe("Login", () => {
     }
   });
 
-  it("order broccoli", () => {
+  it("verify placing an order", () => {
     cy.contains("Veggies & Fruits").click();
     cy.contains("Add to cart").eq(0).click();
     cy.contains("Shopping Cart").click();
@@ -119,7 +119,7 @@ describe("Login", () => {
       .and("contain", "Basil Italian (100gr)");
   });
 
-  it("check if cart is empty when click on x(delete)", () => {
+  it("verify if cart is empty when click on x(delete)", () => {
     cy.contains("Veggies & Fruits").click();
     cy.get("[data-id-product='9']").find(".an_productattributes-add").click();
     cy.get(".sb-close-btn").click();
@@ -161,9 +161,38 @@ describe("Login", () => {
     cy.get("#address-436").should("contain", "home");
   });
 
-  it(" verify update address", () => {
+  it(" verify delete address", () => {
     cy.contains("Addresses").click();
     cy.get("[data-link-action='delete-address']").eq(1).click();
     cy.get("#content").should("have.length", "1");
+  });
+
+  it("verify that out of stock product cannot be added to the cart", () => {
+    cy.get(".mm-8 > .amenu-link").click();
+    cy.get("h1").should("contain", "Drinks");
+    // cy.get('[data-id-product-attribute="7"]')
+    //   .contains("Add to cart")
+    //   .click()
+    //   .should("be.disabled");
+  });
+
+  it.only("verify price change when change product weight", () => {
+    const weight = ["250 gr", "500 gr", "1 kg"];
+    const broccoli = ["Rp19,500", "Rp29,500", "Rp48,000"];
+    const weightValues = ["366", "367"];
+    cy.contains("Veggies & Fruits").click();
+
+    weight.forEach((value, index) => {
+      cy.get(".product-prices-block").eq(0).should("contain", broccoli[index]);
+      cy.get('[class="an_productattributes-dropdown-toggler"]')
+        .eq(0)
+        .should("contain", value);
+
+      if (index < 2) {
+        cy.get('[class="an_productattributes-dropdown-toggler"]').eq(0).click();
+        cy.get(`[data-value="${weightValues[index]}"]`).eq(0).click();
+        cy.get(".js-an_productattributes-filter-option").eq(0);
+      }
+    });
   });
 });
