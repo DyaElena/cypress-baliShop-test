@@ -119,21 +119,42 @@ describe("Login", () => {
       .and("contain", "Basil Italian (100gr)");
   });
 
-  it("verify if cart is empty when click on x(delete)", () => {
+  it("verify if cart is empty when click on x(delete) before 'proceed to checkout'", () => {
     cy.contains("Veggies & Fruits").click();
     cy.get("[data-id-product='9']").find(".an_productattributes-add").click();
     cy.get(".sb-close-btn").click();
     cy.get('[data-id-product="289"]').find(".an_productattributes-add").click();
     cy.get(".sb-close-btn").click();
     cy.get('[data-id-product="11"]').find(".an_productattributes-add").click();
-    cy.get(
-      "#js-cart-sidebar > .cart-dropdown-wrapper > .cart-items > .cart-product-line > .product-remove > .remove-from-cart"
-    )
-      .eq(1)
-      .click({ force: true }); // remove 1 item from the preview cart
+    cy.get("#js-cart-sidebar")
+      .find(".cart-items")
+      .find("li")
+      .should("have.length", "3");
+    cy.get("#js-cart-sidebar")
+      .find(".cart-items")
+      .find(".remove-from-cart")
+      .click({ multiple: true });
+
+    cy.get("#js-cart-sidebar").should(
+      "contain",
+      "There are no more items in your cart"
+    );
+  });
+
+  it("verify if cart is empty when click on x(delete) in cart", () => {
+    cy.contains("Veggies & Fruits").click();
+    cy.get("[data-id-product='9']").find(".an_productattributes-add").click();
+    cy.get(".sb-close-btn").click();
+    cy.get('[data-id-product="289"]').find(".an_productattributes-add").click();
+    cy.get(".sb-close-btn").click();
+    cy.get('[data-id-product="11"]').find(".an_productattributes-add").click();
     cy.get(".cart-action a").eq(1).click({ force: true });
-    cy.get(".cart-item").find(".remove-from-cart").eq(0).click(); // delete 2nd item from the card
-    cy.get(".cart-item").find(".remove-from-cart").eq(1).click(); // delete last item from the card
+    cy.get('[class="cart-overview js-cart"]')
+      .find("li")
+      .should("have.length", "3"); // check that all items were added to the cart
+    cy.get(".cart-item").find(".remove-from-cart").eq(0).click();
+    cy.get(".cart-item").find(".remove-from-cart").eq(1).click();
+    cy.get(".cart-item").find(".remove-from-cart").eq(2).click();
     cy.get(".no-items").should("be.visible"); // check if cart is empty
   });
 
@@ -168,15 +189,14 @@ describe("Login", () => {
   });
 
   it("verify that out of stock product cannot be added to the cart", () => {
-    cy.get(".mm-8 > .amenu-link").click();
-    cy.get("h1").should("contain", "Drinks");
-    // cy.get('[data-id-product-attribute="7"]')
-    //   .contains("Add to cart")
-    //   .click()
-    //   .should("be.disabled");
+    cy.contains("Dairy & Eggs").click();
+    cy.get("h1").should("contain", "Dairy & Eggs");
+    cy.get('[data-id-product="164"]')
+      .contains("Add to cart")
+      .should("be.disabled");
   });
 
-  it.only("verify price change when change product weight", () => {
+  it("verify price change when change product weight", () => {
     const weight = ["250 gr", "500 gr", "1 kg"];
     const broccoli = ["Rp19,500", "Rp29,500", "Rp48,000"];
     const weightValues = ["366", "367"];
