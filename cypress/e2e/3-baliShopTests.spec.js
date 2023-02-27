@@ -1,4 +1,4 @@
-describe("Login", () => {
+describe("Tests", () => {
   beforeEach("Login", () => {
     cy.visit("https://balifoodstore.com/en/login?back=my-account");
     cy.get('[placeholder="Email"]').type("luzefegy@finews.biz");

@@ -1,4 +1,4 @@
-describe("Log in ", () => {
+describe("Sign in ", () => {
   beforeEach("open website", () => {
     cy.visit("https://balifoodstore.com/en/login?back=my-account");
     cy.get(".notification_cookie-accept").click();
@@ -46,5 +46,14 @@ describe("Log in ", () => {
     cy.get('[placeholder="Password"]').type("itsmeHello1");
     cy.get('[data-action="show-password"]').click();
     cy.get('[placeholder="Password"]').should("have.attr", "type", "text");
+  });
+
+  it("verify forgot password functionality", () => {
+    cy.get(".forgot-password").click();
+    cy.get("#email").type("luzefegy@finews.biz");
+    cy.contains("Send").click();
+    cy.contains(
+      "If this email address has been registered in our shop, you will receive a link to reset your password"
+    ).should("be.visible");
   });
 });
