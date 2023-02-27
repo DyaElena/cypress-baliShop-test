@@ -26,7 +26,7 @@ describe("Sorting tests", () => {
     });
   });
 
-  it.only("should display products sorted by descending price", () => {
+  it("should display products sorted by descending price", () => {
     cy.get(".search-open-btn").click();
     cy.get('[placeholder="Search"]').type("chocolate");
     cy.get(".center_wrapper > button.hidden-sm-down").click();
@@ -41,5 +41,54 @@ describe("Sorting tests", () => {
       });
       expect(prices).to.deep.equal(prices.slice().sort((a, b) => b - a));
     });
+  });
+
+  function assertSortedByName($titles) {
+    const titles = $titles.map((index, element) => element.innerText.trim());
+
+    for (let i in titles.length - 1) {
+      if (titles[i] > titles[i + 1]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  it("should display products sorted from A-Z", () => {
+    cy.get(".search-open-btn").click();
+    cy.get('[placeholder="Search"]').type("chocolate");
+    cy.get(".center_wrapper > button.hidden-sm-down").click();
+
+    cy.get(".select-title").click();
+    cy.get(".dropdown-menu > a").eq(1).click();
+
+    cy.get(".product-title > a", { timeout: 10000 })
+      .should("have.length.at.least", 2)
+      .should(assertSortedByName);
+  });
+
+  function assertSortedByNameDescending($titles) {
+    const titles = $titles.map((index, element) => element.innerText.trim());
+
+    for (let j in titles.length - 1) {
+      if (titles[j] < titles[j + 1]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  it("should display products sorted from Z-A", () => {
+    cy.get(".search-open-btn").click();
+    cy.get('[placeholder="Search"]').type("chocolate");
+    cy.get(".center_wrapper > button.hidden-sm-down").click();
+
+    cy.get(".select-title").click();
+    cy.get(".dropdown-menu > a").eq(2).click();
+
+    cy.get(".product-title > a", { timeout: 10000 })
+      .should("have.length.at.least", 2)
+      .should(assertSortedByNameDescending);
   });
 });
