@@ -1,12 +1,18 @@
 describe("Sorting tests", () => {
   beforeEach("Login", () => {
-    cy.visit("https://balifoodstore.com/en/login?back=my-account");
-    cy.get('[placeholder="Email"]').type("luzefegy@finews.biz");
-    cy.get('[placeholder="Password"]').type("itsmeHello1!");
-    cy.get("#submit-login").click();
-    cy.get(".notification_cookie-accept").click();
+    cy.session("user-luzefegy@finews.biz", () => {
+      cy.visit("https://balifoodstore.com/en/login?back=my-account");
+      cy.get('[placeholder="Email"]').type("luzefegy@finews.biz");
+      cy.get('[placeholder="Password"]').type("itsmeHello1!");
+      cy.get("#submit-login").click();
+      cy.get(".notification_cookie-accept").click();
+      cy.url().should("contain", "/my-account");
 
-    cy.url().should("contain", "/my-account");
+      cy.get('[aria-label="Logout dropdown"]').click();
+      cy.get(".logout").should("contain", "Sign out");
+    });
+
+    cy.visit("https://balifoodstore.com/en/login?back=my-account");
   });
 
   it("should display products sorted by ascending price", () => {
@@ -79,7 +85,7 @@ describe("Sorting tests", () => {
     return true;
   }
 
-  it("should display products sorted from Z-A", () => {
+  it.only("should display products sorted from Z-A", () => {
     cy.get(".search-open-btn").click();
     cy.get('[placeholder="Search"]').type("chocolate");
     cy.get(".center_wrapper > button.hidden-sm-down").click();
