@@ -1,4 +1,4 @@
-describe("Sign in ", () => {
+describe("Sign in tests", () => {
   beforeEach("open website", () => {
     cy.visit("https://balifoodstore.com/en/login?back=my-account");
     cy.get(".notification_cookie-accept").click();
