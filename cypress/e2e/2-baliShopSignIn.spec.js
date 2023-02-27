@@ -8,6 +8,7 @@ describe("Log in ", () => {
     cy.get('[placeholder="Email"]').type("luzefegy@finews.biz");
     cy.get('[placeholder="Password"]').type("itsmeHello1!");
     cy.get("#submit-login").click();
+    cy.url().should("contain", "my-account");
   });
 
   it("verify unsuccessful login with wrong password and registered email", () => {
@@ -40,14 +41,10 @@ describe("Log in ", () => {
     });
   });
 
-  // WIP
-  it.only("verify show password button", () => {
+  it("verify show password button", () => {
     cy.get('[placeholder="Email"]').type("luzef@finews.biz");
     cy.get('[placeholder="Password"]').type("itsmeHello1");
     cy.get('[data-action="show-password"]').click();
-    cy.get('[placeholder="Password"]').should(
-      "have.ownPropertyDescriptor",
-      "text"
-    );
+    cy.get('[placeholder="Password"]').should("have.attr", "type", "text");
   });
 });
