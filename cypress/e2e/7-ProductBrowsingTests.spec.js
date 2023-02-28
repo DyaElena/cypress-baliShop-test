@@ -34,7 +34,7 @@ describe("Product browsing tests", () => {
     });
   });
 
-  it.only("verify add to favourites", () => {
+  it("verify add to favourites", () => {
     cy.contains("Veggies & Fruits").click();
 
     cy.get("[data-id-product='1']").find(".product-title").click();
@@ -77,5 +77,30 @@ describe("Product browsing tests", () => {
     });
   });
 
-  it("verify product name and correct picture", () => {});
+  it.only("verify product name and correct picture over all pages in chosen category", () => {
+    cy.contains("Veggies & Fruits").click();
+    cy.get(".pagination")
+      .find("li")
+      .eq(4)
+      .invoke("text")
+      .then((text) => {
+        console.log(text);
+        let i = 0;
+        const number = parseInt(text);
+        while (i < number - 1) {
+          cy.get('[class="h3 product-title"]').each((title, titleIndex) => {
+            cy.wrap(title)
+              .invoke("text")
+              .then((text) => {
+                const actualText = text.trim();
+                cy.get("article img")
+                  .eq(titleIndex)
+                  .should("have.attr", "alt", actualText);
+              });
+          });
+          cy.get(".pagination").find(".next").click();
+          i++;
+        }
+      });
+  });
 });
