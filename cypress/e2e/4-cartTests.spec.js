@@ -53,4 +53,34 @@ describe("Cart tests", () => {
     cy.get(".cart-item").find(".remove-from-cart").eq(2).click();
     cy.get(".no-items").should("be.visible"); // check if cart is empty
   });
+
+  it("verify increasing and decreasing amount of items in the cart", () => {
+    cy.contains("Veggies & Fruits").click();
+    cy.get("[data-id-product='9']").find(".an_productattributes-add").click();
+    cy.get(".sb-close-btn").click();
+    cy.get('[data-id-product="289"]').find(".an_productattributes-add").click();
+    cy.get(".sb-close-btn").click();
+    cy.get('[data-id-product="11"]').find(".an_productattributes-add").click();
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.get('[class="cart-overview js-cart"]')
+      .find("li")
+      .should("have.length", "3"); // check that all items were added to the cart
+
+    cy.get(".product-line-grid").eq(0).contains("+").click();
+    cy.get(".product-line-grid").eq(1).contains("+").click();
+    cy.get(".product-line-grid").eq(2).contains("+").click();
+    cy.get("#card-subtotal-products").should("contain", "6 items");
+    cy.get(".product-line-grid").eq(0).contains("-").click();
+    cy.get(".product-line-grid").eq(1).contains("-").click();
+    cy.wait(500);
+    cy.get(".product-line-grid").eq(2).contains("-").click();
+    cy.get("#card-subtotal-products").should("contain", "3 items");
+  });
+
+  it.only("verify that continue shopping button returns customer to catalog", () => {
+    cy.get(".cart-text").click();
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.contains("Continue shopping").click();
+    cy.url().should("contain", "https://balifoodstore.com/en/");
+  });
 });
