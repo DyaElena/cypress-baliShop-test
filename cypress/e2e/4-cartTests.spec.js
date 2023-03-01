@@ -77,10 +77,45 @@ describe("Cart tests", () => {
     cy.get("#card-subtotal-products").should("contain", "3 items");
   });
 
-  it.only("verify that continue shopping button returns customer to catalog", () => {
+  it("verify that continue shopping button returns customer to catalog", () => {
     cy.get(".cart-text").click();
     cy.get(".cart-action a").eq(1).click({ force: true });
     cy.contains("Continue shopping").click();
     cy.url().should("contain", "https://balifoodstore.com/en/");
+  });
+
+  it("verify that checkout button takes customer to checkout page", () => {
+    cy.get(".cart-text").click();
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.contains("Checkout").click();
+    cy.url().should("contain", "https://balifoodstore.com/en/order");
+  });
+
+  it("verify correct delivery price in  checkout page (order less than 150.000 Rp)", () => {
+    cy.get(".cart-text").click();
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.contains("Checkout").click();
+    cy.get("#cart-subtotal-shipping > .value")
+      .invoke("text")
+      .then((text) => {
+        cy.wrap(text).should("be.equal", "Rp35,000");
+      });
+    cy.url().should("contain", "https://balifoodstore.com/en/order");
+  });
+
+  it("verify correct delivery price in  checkout page (order more than 150.000 Rp)", () => {
+    cy.get(".cart-text").click();
+    cy.get(".cart-action a").eq(1).click({ force: true });
+    cy.get(".product-line-grid").eq(0).contains("+").click().click().click();
+    cy.get(".product-line-grid").eq(1).contains("+").click().click().click();
+    cy.get(".product-line-grid").eq(2).contains("+").click().click().click();
+
+    cy.contains("Checkout").click();
+    cy.get("#cart-subtotal-shipping > .value")
+      .invoke("text")
+      .then((text) => {
+        cy.wrap(text).should("be.equal", "Free");
+      });
+    cy.url().should("contain", "https://balifoodstore.com/en/order");
   });
 });
