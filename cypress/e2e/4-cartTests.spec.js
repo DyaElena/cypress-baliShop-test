@@ -103,7 +103,7 @@ describe("Cart tests", () => {
     cy.url().should("contain", "https://balifoodstore.com/en/order");
   });
 
-  it.only("verify correct delivery price in  checkout page (order more than 150.000 Rp)", () => {
+  it("verify correct delivery price in  checkout page (order more than 150.000 Rp)", () => {
     cy.get(".cart-text").click();
     cy.get(".cart-action a").eq(1).click({ force: true });
     cy.get(".product-line-grid").eq(0).contains("+").click().click().click();
