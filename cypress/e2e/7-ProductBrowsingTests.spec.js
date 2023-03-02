@@ -24,14 +24,68 @@ describe("Product browsing tests", () => {
   });
 
   it("verify search results", () => {
+    const searchFor = ["Cheese", "Eggs", "Gelato", "Keto"]; // search works poorly on this website. For most categories includes from result
+
+    searchFor.forEach((searchName) => {
+      cy.get(".search-open-btn").click();
+      cy.get("form[class='search-form open']").should("be.visible");
+      cy.get('[placeholder="Search"]').clear().type(searchName);
+      cy.get(".center_wrapper > button.hidden-sm-down").click();
+
+      cy.get('[class="h3 product-title"]').each((item) => {
+        cy.wrap(item).should("contain", searchName);
+      });
+    });
+  });
+
+  it.only("verify that different tastes of juices can be selected and added to the cart", () => {
     cy.get(".search-open-btn").click();
     cy.get("form[class='search-form open']").should("be.visible");
-    cy.get('[placeholder="Search"]').type("cheese");
+    cy.get('[placeholder="Search"]').clear().type("juice");
     cy.get(".center_wrapper > button.hidden-sm-down").click();
+    cy.get('[class="h3 product-title"]').eq(0).click();
+    cy.get("h1").should("contain", "Fresh Vegetable Juice Mixed (250ml)");
 
-    cy.get('[class="h3 product-title"]').each((item) => {
-      cy.wrap(item).should("contain", "Cheese");
-    });
+    // with each method
+    cy.get("#group_22 > li").eq(0).click();
+    cy.contains("Add to cart").click();
+    cy.get(".sb-close-btn").click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/449-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "38000");
+
+    cy.get("#group_22 > li").eq(1).click();
+    cy.contains("Add to cart").click();
+    cy.get(".sb-close-btn").click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/450-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "38000");
+
+    cy.get("#group_22 > li").eq(2).click();
+    cy.contains("Add to cart").click();
+    cy.get(".sb-close-btn").click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/447-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "40000");
+
+    cy.get("#group_22 > li").eq(3).click();
+    cy.contains("Add to cart").click();
+    cy.get(".sb-close-btn").click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/448-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "53000");
   });
 
   it("verify add to favourites", () => {
@@ -77,7 +131,7 @@ describe("Product browsing tests", () => {
     });
   });
 
-  it.only("verify product name and correct picture over all pages in chosen category", () => {
+  it("verify product name and correct picture over all pages in chosen category", () => {
     cy.contains("Veggies & Fruits").click();
     cy.get(".pagination")
       .find("li")
