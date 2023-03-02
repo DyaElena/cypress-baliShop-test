@@ -24,14 +24,115 @@ describe("Product browsing tests", () => {
   });
 
   it("verify search results", () => {
+    const searchFor = ["Cheese", "Eggs", "Gelato", "Keto"]; // search works poorly on this website. For most categories includes from result
+
+    searchFor.forEach((searchName) => {
+      cy.get(".search-open-btn").click();
+      cy.get("form[class='search-form open']").should("be.visible");
+      cy.get('[placeholder="Search"]').clear().type(searchName);
+      cy.get(".center_wrapper > button.hidden-sm-down").click();
+
+      cy.get('[class="h3 product-title"]').each((item) => {
+        cy.wrap(item).should("contain", searchName);
+      });
+    });
+  });
+
+  it("verify that different tastes of juices can be selected and added to the cart + verify total price", () => {
+    let prices = [];
+
     cy.get(".search-open-btn").click();
     cy.get("form[class='search-form open']").should("be.visible");
-    cy.get('[placeholder="Search"]').type("cheese");
+    cy.get('[placeholder="Search"]').clear().type("juice");
     cy.get(".center_wrapper > button.hidden-sm-down").click();
+    cy.get('[class="h3 product-title"]').eq(0).click();
+    cy.get("h1").should("contain", "Fresh Vegetable Juice Mixed (250ml)");
 
-    cy.get('[class="h3 product-title"]').each((item) => {
-      cy.wrap(item).should("contain", "Cheese");
-    });
+    cy.get("#group_22 > li").eq(0).click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/449-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "38000");
+    cy.get(".current-price > span")
+      .eq(0)
+      .invoke("attr", "content")
+      .then((price) => {
+        prices.push(parseFloat(price));
+      });
+
+    cy.contains("Add to cart").click();
+    cy.get(".product-line-info .value").should("contain", "Green Veggs & Bam");
+    cy.get(".sb-close-btn").click();
+
+    cy.get("#group_22 > li").eq(1).click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/450-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "38000");
+    cy.get(".current-price > span")
+      .eq(0)
+      .invoke("attr", "content")
+      .then((price) => {
+        prices.push(parseFloat(price));
+      });
+    cy.contains("Add to cart").click();
+    cy.get(".product-line-info .value").eq(1).should("contain", "Holy Greens");
+    cy.get(".sb-close-btn").click();
+
+    cy.get("#group_22 > li").eq(2).click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/447-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "40000");
+    cy.get(".current-price > span")
+      .eq(0)
+      .invoke("attr", "content")
+      .then((price) => {
+        prices.push(parseFloat(price));
+      });
+    cy.contains("Add to cart").click();
+    cy.get(".product-line-info .value").eq(2).should("contain", "Re-Start");
+    cy.get(".sb-close-btn").click();
+
+    cy.get("#group_22 > li").eq(3).click();
+    cy.get(".product-cover > img").should(
+      "have.attr",
+      "src",
+      "https://balifoodstore.com/448-large_default/fresh-vegetable-juice-mixed-250ml.jpg"
+    );
+    cy.get(".current-price > span").should("have.attr", "content", "53000");
+    cy.get(".current-price > span")
+      .eq(0)
+      .invoke("attr", "content")
+      .then((price) => {
+        prices.push(parseFloat(price));
+      });
+    cy.contains("Add to cart").click();
+    cy.get(".product-line-info .value").eq(3).should("contain", "Celery Juice");
+    cy.get(".cart-action a").eq(1).click({ force: true });
+
+    cy.get(".cart-items .cart-item")
+      .its("length")
+      .then((cartItemsNumber) => {
+        cy.get("#card-subtotal-products > .label").should(
+          "contain",
+          cartItemsNumber
+        );
+      });
+
+    cy.get("#card-subtotal-products > .value")
+      .invoke("text")
+      .then((text) => {
+        const price = +text.slice(2).replace(",", "");
+        const expectedPrice = prices.reduce((acc, cur) => acc + cur, 0);
+        expect(price).to.equal(expectedPrice);
+      });
   });
 
   it("verify add to favourites", () => {
@@ -77,7 +178,7 @@ describe("Product browsing tests", () => {
     });
   });
 
-  it.only("verify product name and correct picture over all pages in chosen category", () => {
+  it("verify product name and correct picture over all pages in chosen category", () => {
     cy.contains("Veggies & Fruits").click();
     cy.get(".pagination")
       .find("li")
@@ -102,5 +203,13 @@ describe("Product browsing tests", () => {
           i++;
         }
       });
+  });
+
+  it.only("clear cart", () => {
+    cy.visit("https://balifoodstore.com/en/cart?action=show");
+
+    cy.get(".cart-items > li >.product-line-grid").each((li) => {
+      cy.wrap(li).find(".remove-from-cart").click();
+    });
   });
 });
