@@ -153,9 +153,11 @@ describe("Product browsing tests", () => {
   it("verify that out of stock product cannot be added to the cart", () => {
     cy.contains("Dairy & Eggs").click();
     cy.get("h1").should("contain", "Dairy & Eggs");
-    cy.get('[data-id-product="164"]')
-      .contains("Add to cart")
-      .should("be.disabled");
+    cy.get('[data-id-product="164"]').click();
+    cy.get("#product-availability").should("contain", "Out of Stock");
+    cy.contains("Add to cart").should("be.disabled");
+    cy.contains("Notify me when available").should("be.visible").click();
+    cy.get('article[class="alert alert-info"]').should("be.visible");
   });
 
   it("verify price change when change product weight", () => {
@@ -208,8 +210,16 @@ describe("Product browsing tests", () => {
   it.only("clear cart", () => {
     cy.visit("https://balifoodstore.com/en/cart?action=show");
 
-    cy.get(".cart-items > li >.product-line-grid").each((li) => {
-      cy.wrap(li).find(".remove-from-cart").click();
-    });
+    cy.get('[class="cart-overview js-cart"]')
+      .its("length")
+      .then((length) => {
+        if (length > 0) {
+          cy.get(".cart-items > li >.product-line-grid").each((li) => {
+            cy.wrap(li).find(".remove-from-cart").click();
+          });
+        } else {
+          return;
+        }
+      });
   });
 });
