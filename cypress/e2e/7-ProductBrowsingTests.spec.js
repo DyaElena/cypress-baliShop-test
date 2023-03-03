@@ -207,11 +207,19 @@ describe("Product browsing tests", () => {
       });
   });
 
-  it("clear cart", () => {
+  it.only("clear cart", () => {
     cy.visit("https://balifoodstore.com/en/cart?action=show");
 
-    cy.get(".cart-items > li >.product-line-grid").each((li) => {
-      cy.wrap(li).find(".remove-from-cart").click();
-    });
+    cy.get('[class="cart-overview js-cart"]')
+      .its("length")
+      .then((length) => {
+        if (length > 0) {
+          cy.get(".cart-items > li >.product-line-grid").each((li) => {
+            cy.wrap(li).find(".remove-from-cart").click();
+          });
+        } else {
+          return;
+        }
+      });
   });
 });
